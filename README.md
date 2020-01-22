@@ -5,7 +5,7 @@ _Just data things_
 > Aim here is to implement a friendly interface to deal with data, treating all data as asynchronous. 
 > 
 > In all cases of reading data, `AsyncIterable` will be uses where multiple values are possible, 
-> and `Promsie` will be value is available 
+> and `Promise` will be value is available 
 
 ## Contributing
 
