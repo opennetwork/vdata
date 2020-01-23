@@ -1,7 +1,7 @@
-const FileHound = require('filehound');
-const fs = require("fs");
-const path = require("path");
-const { promisify } = require("util");
+import FileHound from "filehound";
+import fs from "fs";
+import path from "path";
+import { promisify } from "util";
 
 FileHound.create()
   .paths("./dist")
@@ -14,7 +14,7 @@ FileHound.create()
         filePaths.map(
           async filePath => {
 
-            let contents = await promisify(fs.readFile)(
+            let contents = await fs.promises.readFile(
               filePath,
               "utf-8"
             );
@@ -28,23 +28,28 @@ FileHound.create()
             await Promise.all(
               statements.map(
                 async statement => {
-                  const url = statement.match(/"(.+)";/)[1];
+                  let url = statement.match(/"(.+)";/)[1];
+                  let stat, indexStat;
                   if (url.indexOf(".") !== 0) {
-                    return;
+                    [stat, indexStat] = await Promise.all([
+                      fs.promises.stat(`node_modules/${url}.js`).catch(() => {}),
+                      fs.promises.stat(`node_modules/${url}/index.js`).catch(() => {})
+                    ]);
+                  } else {
+                    [stat, indexStat] = await Promise.all([
+                      fs.promises.stat(path.resolve(path.dirname(filePath), `${url}.js`)).catch(() => {}),
+                      fs.promises.stat(path.resolve(path.dirname(filePath), `${url}/index.js`)).catch(() => {})
+                    ]);
                   }
-                  const [stat, indexStat] = await Promise.all([
-                    promisify(fs.stat)(path.resolve(path.dirname(filePath), url + ".js")).catch(() => {}),
-                    promisify(fs.stat)(path.resolve(path.dirname(filePath), url + "/index.js")).catch(() => {})
-                  ]);
                   if (stat && stat.isFile()) {
                     contents = contents.replace(
                       statement,
-                      statement.replace(url, url + ".js")
+                      statement.replace(url, `${url}.js`)
                     );
                   } else if (indexStat && indexStat.isFile()) {
                     contents = contents.replace(
                       statement,
-                      statement.replace(url, url + "/index.js")
+                      statement.replace(url, `${url}/index.js`)
                     );
                   }
                 }
