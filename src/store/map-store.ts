@@ -2,19 +2,11 @@ import { Store } from "./store";
 import { ExtendedIterableAsyncImplementation } from "iterable/dist/iterable/iterable-async-implementation";
 import { BasicMap } from "iterable/dist/iterable/reference-map";
 
-function mapAccessor<Key, Value>(map: Map<Key, Value>): AsyncIterable<[Key, Value]> {
-  return {
-    async *[Symbol.asyncIterator](): AsyncIterator<[Key, Value]> {
-      yield *map;
-    }
-  };
-}
-
 export class MapStore<Key, Value> extends ExtendedIterableAsyncImplementation<[Key, Value]> implements Store<Key, Value> {
 
-  constructor(private internalMap = new Map<Key, Value>()) {
+  constructor(private readonly internalMap = new Map<Key, Value>()) {
     super(
-      mapAccessor(internalMap),
+      internalMap,
       BasicMap
     );
   }
@@ -36,7 +28,7 @@ export class MapStore<Key, Value> extends ExtendedIterableAsyncImplementation<[K
   }
 
   async *[Symbol.asyncIterator]() {
-    yield *mapAccessor(this.internalMap);
+    yield *this.internalMap;
   }
 
   async has(key: Key) {
