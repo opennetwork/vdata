@@ -23,9 +23,9 @@ export interface NodeFSInterfaceDependencies<Data extends FSInterfaceData> {
 
 export class NodeFSInterface<Data extends FSInterfaceData = FSInterfaceData, Dependencies extends NodeFSInterfaceDependencies<Data> = NodeFSInterfaceDependencies<Data>> implements FSInterface<Data> {
 
-  public createContext: (key: string) => Promise<void> | undefined = undefined;
+  public readonly createContext: (key: string) => Promise<void> | undefined = undefined;
 
-  constructor(protected dependencies: Dependencies) {
+  constructor(protected readonly dependencies: Dependencies) {
 
     const { fsExtras } = dependencies;
 
@@ -38,7 +38,6 @@ export class NodeFSInterface<Data extends FSInterfaceData = FSInterfaceData, Dep
     }
 
   }
-
 
   join(context: string, key: string) {
     return this.dependencies.path.join(context, key);

@@ -5,7 +5,7 @@ import { ScalarStore } from "../scalar-store";
 
 export class ContextStore<Key, Value> extends ExtendedIterableAsyncImplementation<[Key, Value]> implements ScalarStore<Key, Value> {
 
-  constructor(protected readonly currentContext: Key, protected contextInterface: ContextInterface<Key, Value>) {
+  constructor(protected readonly currentContext: Key, protected readonly contextInterface: ContextInterface<Key, Value>) {
     super(contextInterface.asyncIterable(currentContext), BasicMap);
   }
 
